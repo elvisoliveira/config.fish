@@ -9,6 +9,10 @@ function gv
     fzf --preview='bat --theme=Dracula --color=always {1} --highlight-line {2}' \
         --delimiter=':' \
         --ansi \
-        --color "hl:-1:underline,hl+:-1:underline:reverse" \
-        --preview-window 'up,60%,border-bottom,+{2}+3/3,~3'
+        --color "hl:-1:underline,hl+:-1:underline:reverse" | read stdout
+    set file (echo $stdout | cut -f1 -d":")
+    set line (echo $stdout | cut -f2 -d":")
+    if test -n "$file"
+        vim +"$line" $file -c 'normal zz' < /dev/tty
+    end
 end
