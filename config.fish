@@ -78,3 +78,4 @@ function gv
 end
 
 vf activate python3
+nvm use latest --silent
