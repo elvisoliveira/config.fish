@@ -61,12 +61,13 @@ end
 # end
 
 # gv stands for grep view
+# bat --theme=Dracula --color=always --highlight-line $2 $1
 function gv
     # usage: grep -rn "regex" | gv
     # requires:
     # https://github.com/junegunn/fzf
     # https://github.com/sharkdp/bat
-    fzf --preview='bat --theme=Dracula --color=always {1} --highlight-line {2}' \
+    fzf --preview='fzf-bat-preview {1} {2}' \
         --delimiter=':' \
         --ansi \
         --color "hl:-1:underline,hl+:-1:underline:reverse" | read stdout
