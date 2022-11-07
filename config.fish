@@ -9,6 +9,8 @@ set -Ux EDITOR nvim
 
 alias ls="ls --color=always"
 alias vi="nvim"
+alias grep="grep -rn"
+alias scrcpy="scrcpy --stay-awake --turn-screen-off --max-size 800 --bit-rate 2M --hid-keyboard"
 
 function c
     cat $argv ^/dev/null | tr -d '\n' | read -l input
@@ -79,4 +81,4 @@ function gv
 end
 
 vf activate python3
-nvm use latest --silent
+nvm use v18.11.0 --silent
