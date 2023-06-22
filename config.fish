@@ -11,13 +11,13 @@ set -Ux VIRTUAL_ENV_DISABLE_PROMPT 1
 alias ls="ls --color=always"
 alias vi="nvim"
 alias grep="grep -n --exclude-dir={node_modules,vendor,.git,dll,tests}"
-alias scrcpy="scrcpy --stay-awake --turn-screen-off --max-size 800 --bit-rate 2M --hid-keyboard --serial ZF5236LMZK"
+alias scrcpy="scrcpy --stay-awake --turn-screen-off --max-size 800 --video-bit-rate 2M --hid-keyboard --serial ZF5236LMZK --no-audio"
 
 function c
-    cat $argv ^/dev/null | tr -d '\n' | read -l input
-    set -ql input; or set -l input $argv
+    read -l a
+    set x (string trim -- $a)
     for i in "--primary" "--secondary" "--clipboard"
-        echo $input | xsel --input $i
+        echo $x |tr -d '\n\t\r' | xsel --input $i
     end
 end
 
