@@ -9,7 +9,12 @@ set -gx PYENV_ROOT $HOME/.pyenv
 set -gx EDITOR nvim
 set -gx VIRTUAL_ENV_DISABLE_PROMPT 1
 set -gx BUN_INSTALL $HOME/.bun
-set -gx CLOUDSDK_PYTHON $PYENV_ROOT/versions/3.11.9/bin/python
+
+# gcloud needs python; pin it to the pyenv-managed interpreter only when that
+# specific install is present, otherwise leave gcloud to use its bundled one.
+if test -x $PYENV_ROOT/versions/3.11.9/bin/python
+    set -gx CLOUDSDK_PYTHON $PYENV_ROOT/versions/3.11.9/bin/python
+end
 
 fish_add_path -gm $HOME/.rbenv/bin
 fish_add_path -gm $HOME/.rbenv/shims
@@ -26,9 +31,15 @@ else
 end
 alias vi="nvim"
 alias grep="grep -n --exclude-dir={.git,node_modules,vendor,dll,build,coverage}"
-alias scrcpy="scrcpy --max-size 800 --video-bit-rate 2M --keyboard=uhid"
-alias ranger="ranger --choosedir=\"$HOME/.rangerdir\"; cd (cat $HOME/.rangerdir)"
 alias boldssh="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
+
+if command -q scrcpy
+    alias scrcpy="scrcpy --max-size 800 --video-bit-rate 2M --keyboard=uhid"
+end
+
+if command -q ranger
+    alias ranger="ranger --choosedir=\"$HOME/.rangerdir\"; cd (cat $HOME/.rangerdir)"
+end
 
 function copy
     if test (count $argv) -gt 0
@@ -186,6 +197,3 @@ function gv
     end
 end
 
-### MANAGED BY RANCHER DESKTOP START (DO NOT EDIT)
-set --export --prepend PATH "/home/elvisoliveira/.rd/bin"
-### MANAGED BY RANCHER DESKTOP END (DO NOT EDIT)
