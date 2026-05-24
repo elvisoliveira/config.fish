@@ -21,6 +21,7 @@ fish_add_path -gm $HOME/.rbenv/shims
 fish_add_path -gm $BUN_INSTALL/bin
 fish_add_path -gm $HOME/.nvm/versions/node/v24.8.0/bin
 fish_add_path -gm $PYENV_ROOT/bin
+fish_add_path -gm $HOME/.local/bin
 
 # GNU coreutils ls uses --color, BSD ls (macOS) uses -G. Same intent, two
 # flags, so split by platform.
