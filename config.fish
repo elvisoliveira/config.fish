@@ -42,28 +42,50 @@ if command -q ranger
     alias ranger="ranger --choosedir=\"$HOME/.rangerdir\"; cd (cat $HOME/.rangerdir)"
 end
 
-# https://gist.github.com/gabesoft/b6e5e959c4cb11ed257d41edb07d47cb
-function gbr --description "Git browse commits"
-    set -l log_line_to_hash "echo {} | grep -o '[a-f0-9]\{7\}' | head -1"
-    set -l view_commit "$log_line_to_hash | xargs -I % sh -c 'git show --color=always % | ~/diff-so-fancy | less -R'"
-    set -l copy_commit_hash "$log_line_to_hash | fish -c copy"
-    set -l git_checkout "$log_line_to_hash | xargs -I % sh -c 'git checkout %'"
-    set -l open_cmd "open"
+function __glog_delta_opts
+    set -l outer_term $TERM
+    if set -q TMUX
+        set outer_term (command tmux display-message -p '#{client_termname}' 2>/dev/null)
+    end
+    if test "$outer_term" = linux
+        echo --true-color=never --syntax-theme=none
+    end
+end
 
-    if test (uname) = Linux
-        set open_cmd "xdg-open"
+function glog --description "Git browse commits"
+    set -l hash "echo {} | command grep -o '[a-f0-9]\{7\}' | head -1"
+    set -l delta_opts (__glog_delta_opts)
+    function __view --inherit-variable hash --inherit-variable delta_opts
+        echo "$hash | xargs -I % sh -c 'git show % | delta $delta_opts $argv'"
+    end
+    set -l browse_files "$hash | xargs -I % fish -c 'glogf %'"
+
+    git log --color=always --format='%C(auto)%h%d %s %C(green)%C(bold)%cr %C(blue)%an' | \
+        fzf --no-sort --reverse --tiebreak=index --no-multi --ansi \
+            --preview=(__view) \
+            --header="ENTER to view, CTRL-F to browse files, CTRL-U/CTRL-D to scroll preview, CTRL-C to exit" \
+            --bind "enter:execute:"(__view --side-by-side) \
+            --bind "ctrl-f:execute:$browse_files" \
+            --bind "ctrl-u:preview-half-page-up,ctrl-d:preview-half-page-down"
+
+    functions -e __view
+end
+
+function glogf --description "Git browse files in a commit" --argument-names commit
+    if test -z "$commit"
+        echo "usage: glogf <commit>" >&2
+        return 1
     end
 
-    set -l github_open "$log_line_to_hash | xargs -I % sh -c '$open_cmd https://github.\$(git config remote.origin.url | cut -f2 -d. | tr \':\' /)/commit/%'"
+    set -l delta_opts (__glog_delta_opts)
+    set -l view "git show --format= $commit -- {} | delta $delta_opts"
 
-    git log --color=always --format='%C(auto)%h%d %s %C(green)%C(bold)%cr% C(blue)%an' | \
-        fzf --no-sort --reverse --tiebreak=index --no-multi --ansi \
-            --preview="$view_commit" \
-            --header="ENTER to view, CTRL-Y to copy hash, CTRL-O to open on GitHub, CTRL-X to checkout, CTRL-C to exit" \
-            --bind "enter:execute:$view_commit" \
-            --bind "ctrl-y:execute:$copy_commit_hash" \
-            --bind "ctrl-x:execute:$git_checkout" \
-            --bind "ctrl-o:execute:$github_open"
+    git diff-tree --no-commit-id --name-only -r $commit | \
+        fzf --no-sort --reverse --ansi \
+            --preview="$view" \
+            --header="$commit · ENTER to view, CTRL-U/CTRL-D to scroll preview, CTRL-C to exit" \
+            --bind "enter:execute:$view --side-by-side" \
+            --bind "ctrl-u:preview-half-page-up,ctrl-d:preview-half-page-down"
 end
 
 
