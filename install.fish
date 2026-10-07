@@ -15,22 +15,23 @@ mkdir -p $dest/functions $dest/conf.d
 # removed. Leaves unrelated files (toolstation, nvm, plugins) untouched.
 for dir in $dest/functions $dest/conf.d
     for f in $dir/*
-        if test -L "$f"; and string match -q "$src/*" (readlink "$f"); and not test -e "$f"
+        if test -L "$f"; and string match -q "$src/*" (readlink -m "$f"); and not test -e "$f"
             rm -v "$f"
         end
     end
 end
 
 # Entry point (kept minimal; real config is in conf.d/).
-ln -sfv $src/config.fish $dest/config.fish
+ln -sfrv $src/config.fish $dest/config.fish
 
 # Autoloaded functions and startup snippets — one symlink per file.
+# -r: relative links, so the tree survives a different $HOME or user.
 for f in $src/functions/*.fish
-    ln -sfv $f $dest/functions/(path basename $f)
+    ln -sfrv $f $dest/functions/(path basename $f)
 end
 
 for f in $src/conf.d/*.fish
-    ln -sfv $f $dest/conf.d/(path basename $f)
+    ln -sfrv $f $dest/conf.d/(path basename $f)
 end
 
 echo "config.fish installed -> $dest"
