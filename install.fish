@@ -11,27 +11,34 @@ set -l dest $HOME/.config/fish
 
 mkdir -p $dest/functions $dest/conf.d
 
+# ln -r (relative links) is GNU-only; BSD ln (macOS) gets absolute links.
+set -l rel -r
+ln --version &>/dev/null; or set rel
+
 # Prune our own stale symlinks: links into this module whose source file was
 # removed. Leaves unrelated files (toolstation, nvm, plugins) untouched.
 for dir in $dest/functions $dest/conf.d
     for f in $dir/*
-        if test -L "$f"; and string match -q "$src/*" (readlink -m "$f"); and not test -e "$f"
+        # readlink -m is GNU-only; resolve the (maybe relative) target by hand.
+        set -l t (readlink "$f" 2>/dev/null)
+        string match -q '/*' -- "$t"; or set t $dir/$t
+        if test -L "$f"; and string match -q "$src/*" (path normalize $t); and not test -e "$f"
             rm -v "$f"
         end
     end
 end
 
 # Entry point (kept minimal; real config is in conf.d/).
-ln -sfrv $src/config.fish $dest/config.fish
+ln -sfv $rel $src/config.fish $dest/config.fish
 
 # Autoloaded functions and startup snippets — one symlink per file.
 # -r: relative links, so the tree survives a different $HOME or user.
 for f in $src/functions/*.fish
-    ln -sfrv $f $dest/functions/(path basename $f)
+    ln -sfv $rel $f $dest/functions/(path basename $f)
 end
 
 for f in $src/conf.d/*.fish
-    ln -sfrv $f $dest/conf.d/(path basename $f)
+    ln -sfv $rel $f $dest/conf.d/(path basename $f)
 end
 
 echo "config.fish installed -> $dest"

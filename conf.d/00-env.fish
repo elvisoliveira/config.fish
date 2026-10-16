@@ -36,7 +36,9 @@ set -gx GOPATH $HOME/tools/go
 fish_add_path -gm $GOPATH/bin
 
 alias vi="nvim"
-alias ls="eza --icons"
+if command -q eza
+    alias ls="eza --icons"
+end
 # alias grep="rg -n --glob '!{.git,node_modules,vendor,dll,build,coverage}'"
 alias boldssh="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
 
@@ -44,7 +46,9 @@ if command -q scrcpy
     alias scrcpy="scrcpy --max-size 800 --video-bit-rate 2M --keyboard=uhid"
 end
 
-zoxide init --cmd cd fish | source
+if command -q zoxide
+    zoxide init --cmd cd fish | source
+end
 
 # sudo without a tty: password popup on the active tmux client (see ~/.env/.tmux.conf/bin/askpass/README.md)
 set -gx SUDO_ASKPASS $HOME/.env/.tmux.conf/bin/askpass/askpass-tmux
