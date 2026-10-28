@@ -71,10 +71,10 @@ alias boldssh="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
 
 if command -q scrcpy
     alias scrcpy="scrcpy --max-size 800 --video-bit-rate 2M --keyboard=uhid"
-    # Navegador do Android como janela de desktop: display virtual só com o Firefox
-    # oficial, sem barras do Android, janela tiled normal (SDL_APP_ID
+    # Navegador do Android como janela de desktop: display virtual só com o Brave
+    # (GeckoView renderiza mal no display virtual), sem barras do Android, janela tiled normal (SDL_APP_ID
     # foge da regra floating do sway). `env` pula o alias acima.
-    alias scrcpy-desktop="env SDL_APP_ID=scrcpy-desktop scrcpy --new-display=1872x1008/160 --no-vd-system-decorations --video-codec=h265 --video-bit-rate=20M --max-fps=60 --keyboard=uhid --mouse=sdk --mouse-bind=++++ --start-app=org.mozilla.firefox"
+    alias scrcpy-desktop="env SDL_APP_ID=scrcpy-desktop scrcpy --new-display=1872x1008/160 --no-vd-system-decorations --video-codec=h265 --video-bit-rate=20M --max-fps=60 --keyboard=uhid --mouse=sdk --mouse-bind=++++ --start-app=com.brave.browser"
 end
 
 if command -q zoxide
