@@ -71,24 +71,10 @@ alias boldssh="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
 
 if command -q scrcpy
     alias scrcpy="scrcpy --max-size 800 --video-bit-rate 2M --keyboard=uhid"
-    # Android como desktop: display virtual com barras do sistema, janela tiled
-    # (SDL_APP_ID foge da regra floating do sway). `env` pula o alias acima.
-    # ponytail: o launcher nativo de tela secundária (taskbar All Apps) não lança
-    # apps no GrapheneOS/Android 17 (intent sem pacote); o Launcher3 completo lança.
-    function scrcpy-desktop --description 'Android como desktop via scrcpy + Launcher3'
-        set -l log (mktemp)
-        env SDL_APP_ID=scrcpy-desktop scrcpy --new-display=1872x1008/160 --video-codec=h265 --video-bit-rate=20M --max-fps=60 --keyboard=uhid --mouse=sdk --mouse-bind=++++ $argv 2>&1 | tee $log &
-        for i in (seq 60)
-            set -l id (string match -rg 'New display: .*\(id=(\d+)\)' <$log)
-            if test -n "$id"
-                adb shell am start --display $id -n com.android.launcher3/.uioverrides.QuickstepLauncher >/dev/null 2>&1
-                break
-            end
-            sleep 0.25
-        end
-        wait
-        rm -f $log
-    end
+    # Navegador do Android como janela de desktop: display virtual só com o IronFox
+    # (Firefox hardened), sem barras do Android, janela tiled normal (SDL_APP_ID
+    # foge da regra floating do sway). `env` pula o alias acima.
+    alias scrcpy-desktop="env SDL_APP_ID=scrcpy-desktop scrcpy --new-display=1872x1008/160 --no-vd-system-decorations --video-codec=h265 --video-bit-rate=20M --max-fps=60 --keyboard=uhid --mouse=sdk --mouse-bind=++++ --start-app=org.ironfoxoss.ironfox"
 end
 
 if command -q zoxide
