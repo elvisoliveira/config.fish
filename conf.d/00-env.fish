@@ -22,7 +22,11 @@ set -gx DENO_INSTALL /files/tools/deno
 set -gx PHPBREW_ROOT /files/tools/phpbrew
 set -gx PHPBREW_HOME /files/tools/phpbrew
 set -gx CODEX_HOME /files/tools/codex
-set -gx YARN_GLOBAL_FOLDER $HOME/.cache/yarn   # yarn berry global cache (was ~/.yarn/berry)
+# Caches live on /files too (XDG_CACHE_HOME covers pip, composer, huggingface, fish,
+# wezterm, browsers…; npm reads ~/.npmrc `cache=`; kubectl reads KUBECACHEDIR).
+set -gx XDG_CACHE_HOME /files/cache
+set -gx KUBECACHEDIR /files/cache/kube
+set -gx YARN_GLOBAL_FOLDER /files/cache/yarn   # yarn berry global cache (was ~/.yarn/berry)
 
 set -gx EDITOR nvim
 set -gx VIRTUAL_ENV_DISABLE_PROMPT 1
@@ -62,7 +66,7 @@ if command -q scrcpy
     alias scrcpy="scrcpy --max-size 800 --video-bit-rate 2M --keyboard=uhid"
     # Android como desktop: display virtual 1080p, janela tiled normal (SDL_APP_ID
     # foge da regra floating do sway para app_id="scrcpy"). `env` pula o alias acima.
-    alias scrcpy-desktop="env SDL_APP_ID=scrcpy-desktop scrcpy --new-display=1872x1008/160 --no-vd-system-decorations --video-codec=h265 --video-bit-rate=20M --max-fps=60 --keyboard=uhid --mouse=sdk --mouse-bind=++++ --start-app=com.kiwibrowser.browser"
+    alias scrcpy-desktop="env SDL_APP_ID=scrcpy-desktop scrcpy --new-display=1872x1008/160 --no-vd-system-decorations --video-codec=h265 --video-bit-rate=20M --max-fps=60 --keyboard=uhid --mouse=sdk --mouse-bind=++++ --start-app=app.vanadium.browser"
 end
 
 if command -q zoxide
