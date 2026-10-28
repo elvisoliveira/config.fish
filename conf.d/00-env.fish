@@ -28,6 +28,13 @@ set -gx XDG_CACHE_HOME /files/cache
 set -gx KUBECACHEDIR /files/cache/kube
 set -gx YARN_GLOBAL_FOLDER /files/cache/yarn   # yarn berry global cache (was ~/.yarn/berry)
 
+# Dotfiles pushed out of ~ into XDG dirs (2026-10-28). git reads ~/.config/git/config natively.
+set -gx WGETRC $HOME/.config/wgetrc                 # sets hsts-file -> ~/.local/state/wget/hsts
+set -gx W3M_DIR $HOME/.config/w3m
+set -gx RANDFILE $XDG_CACHE_HOME/openssl.rnd        # openssl 1.1 tools' ~/.rnd
+set -gx PASSWORD_STORE_DIR $HOME/.local/share/password-store
+set -gx TMUX_PLUGIN_MANAGER_PATH $HOME/.local/share/tmux/plugins   # tpack/tpm (also set in .tmux.conf)
+
 set -gx EDITOR nvim
 set -gx VIRTUAL_ENV_DISABLE_PROMPT 1
 set -gx BUN_INSTALL /files/tools/bun
@@ -64,9 +71,24 @@ alias boldssh="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
 
 if command -q scrcpy
     alias scrcpy="scrcpy --max-size 800 --video-bit-rate 2M --keyboard=uhid"
-    # Android como desktop: display virtual com barras do sistema (Home = launcher), janela tiled (SDL_APP_ID
-    # foge da regra floating do sway para app_id="scrcpy"). `env` pula o alias acima.
-    alias scrcpy-desktop="env SDL_APP_ID=scrcpy-desktop scrcpy --new-display=1872x1008/160 --video-codec=h265 --video-bit-rate=20M --max-fps=60 --keyboard=uhid --mouse=sdk --mouse-bind=++++ --start-app=app.vanadium.browser"
+    # Android como desktop: display virtual com barras do sistema, janela tiled
+    # (SDL_APP_ID foge da regra floating do sway). `env` pula o alias acima.
+    # ponytail: o launcher nativo de tela secundária (taskbar All Apps) não lança
+    # apps no GrapheneOS/Android 17 (intent sem pacote); o Launcher3 completo lança.
+    function scrcpy-desktop --description 'Android como desktop via scrcpy + Launcher3'
+        set -l log (mktemp)
+        env SDL_APP_ID=scrcpy-desktop scrcpy --new-display=1872x1008/160 --video-codec=h265 --video-bit-rate=20M --max-fps=60 --keyboard=uhid --mouse=sdk --mouse-bind=++++ $argv 2>&1 | tee $log &
+        for i in (seq 60)
+            set -l id (string match -rg 'New display: .*\(id=(\d+)\)' <$log)
+            if test -n "$id"
+                adb shell am start --display $id -n com.android.launcher3/.uioverrides.QuickstepLauncher >/dev/null 2>&1
+                break
+            end
+            sleep 0.25
+        end
+        wait
+        rm -f $log
+    end
 end
 
 if command -q zoxide
