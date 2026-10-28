@@ -21,6 +21,8 @@ set -gx RUSTUP_HOME /files/tools/rustup
 set -gx DENO_INSTALL /files/tools/deno
 set -gx PHPBREW_ROOT /files/tools/phpbrew
 set -gx PHPBREW_HOME /files/tools/phpbrew
+set -gx CODEX_HOME /files/tools/codex
+set -gx YARN_GLOBAL_FOLDER $HOME/.cache/yarn   # yarn berry global cache (was ~/.yarn/berry)
 
 set -gx EDITOR nvim
 set -gx VIRTUAL_ENV_DISABLE_PROMPT 1
@@ -36,6 +38,7 @@ fish_add_path -gm $RBENV_ROOT/bin
 fish_add_path -gm $RBENV_ROOT/shims
 fish_add_path -gm $BUN_INSTALL/bin
 fish_add_path -gm $CARGO_HOME/bin
+fish_add_path -ga /files/tools/maestro/bin
 # Node (nvm.fish) is activated at the END of 50-interactive.fish, on purpose:
 # it must run AFTER the legacy virtualenv activate.fish sourced there, which
 # restores a stale PATH snapshot and would otherwise clobber the node setup.
@@ -59,7 +62,7 @@ if command -q scrcpy
     alias scrcpy="scrcpy --max-size 800 --video-bit-rate 2M --keyboard=uhid"
     # Android como desktop: display virtual 1080p, janela tiled normal (SDL_APP_ID
     # foge da regra floating do sway para app_id="scrcpy"). `env` pula o alias acima.
-    alias scrcpy-desktop="env SDL_APP_ID=scrcpy-desktop scrcpy --new-display=1872x1008/160 --no-vd-system-decorations --video-codec=h265 --video-bit-rate=20M --max-fps=60 --keyboard=uhid --mouse=uhid --start-app=com.kiwibrowser.browser"
+    alias scrcpy-desktop="env SDL_APP_ID=scrcpy-desktop scrcpy --new-display=1872x1008/160 --no-vd-system-decorations --video-codec=h265 --video-bit-rate=20M --max-fps=60 --keyboard=uhid --mouse=sdk --mouse-bind=++++ --start-app=com.kiwibrowser.browser"
 end
 
 if command -q zoxide
