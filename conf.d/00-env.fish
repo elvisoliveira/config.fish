@@ -64,9 +64,9 @@ alias boldssh="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
 
 if command -q scrcpy
     alias scrcpy="scrcpy --max-size 800 --video-bit-rate 2M --keyboard=uhid"
-    # Android como desktop: display virtual 1080p, janela tiled normal (SDL_APP_ID
+    # Android como desktop: display virtual com barras do sistema (Home = launcher), janela tiled (SDL_APP_ID
     # foge da regra floating do sway para app_id="scrcpy"). `env` pula o alias acima.
-    alias scrcpy-desktop="env SDL_APP_ID=scrcpy-desktop scrcpy --new-display=1872x1008/160 --no-vd-system-decorations --video-codec=h265 --video-bit-rate=20M --max-fps=60 --keyboard=uhid --mouse=sdk --mouse-bind=++++ --start-app=app.vanadium.browser"
+    alias scrcpy-desktop="env SDL_APP_ID=scrcpy-desktop scrcpy --new-display=1872x1008/160 --video-codec=h265 --video-bit-rate=20M --max-fps=60 --keyboard=uhid --mouse=sdk --mouse-bind=++++ --start-app=app.vanadium.browser"
 end
 
 if command -q zoxide
