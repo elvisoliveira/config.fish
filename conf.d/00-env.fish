@@ -8,11 +8,23 @@ set -g fish_greeting
 # Add vim key bind
 fish_vi_key_bindings
 
-set -gx PYENV_ROOT $HOME/.pyenv
+# Toolchains live in /files/tools (own partition). Every manager finds its dir
+# through the env var set here — resolve paths via these vars, not by guessing.
+set -gx PYENV_ROOT /files/tools/pyenv
+set -gx WORKON_HOME /files/tools/virtualenvs
+set -gx RBENV_ROOT /files/tools/rbenv
+set -gx SDKMAN_DIR /files/tools/sdkman
+set -gx GRADLE_USER_HOME /files/tools/gradle
+set -gx NVM_DIR /files/tools/nvm            # bash nvm; fish uses nvm.fish ($nvm_data)
+set -gx CARGO_HOME /files/tools/cargo
+set -gx RUSTUP_HOME /files/tools/rustup
+set -gx DENO_INSTALL /files/tools/deno
+set -gx PHPBREW_ROOT /files/tools/phpbrew
+set -gx PHPBREW_HOME /files/tools/phpbrew
 
 set -gx EDITOR nvim
 set -gx VIRTUAL_ENV_DISABLE_PROMPT 1
-set -gx BUN_INSTALL $HOME/.bun
+set -gx BUN_INSTALL /files/tools/bun
 
 # gcloud needs python; pin it to the pyenv-managed interpreter only when that
 # specific install is present, otherwise leave gcloud to use its bundled one.
@@ -20,19 +32,20 @@ if test -x $PYENV_ROOT/versions/3.11.9/bin/python
     set -gx CLOUDSDK_PYTHON $PYENV_ROOT/versions/3.11.9/bin/python
 end
 
-fish_add_path -gm $HOME/.rbenv/bin
-fish_add_path -gm $HOME/.rbenv/shims
+fish_add_path -gm $RBENV_ROOT/bin
+fish_add_path -gm $RBENV_ROOT/shims
 fish_add_path -gm $BUN_INSTALL/bin
+fish_add_path -gm $CARGO_HOME/bin
 # Node (nvm.fish) is activated at the END of 50-interactive.fish, on purpose:
 # it must run AFTER the legacy virtualenv activate.fish sourced there, which
 # restores a stale PATH snapshot and would otherwise clobber the node setup.
 fish_add_path -gm $PYENV_ROOT/bin
 fish_add_path -gm $HOME/.local/bin
 
-# Android SDK + Go — dirs live in ~/tools (symlink-free; env points straight there)
-set -gx ANDROID_HOME $HOME/tools/android/sdk
-set -gx ANDROID_SDK_ROOT $HOME/tools/android/sdk
-set -gx GOPATH $HOME/tools/go
+# Android SDK + Go
+set -gx ANDROID_HOME /files/tools/android/sdk
+set -gx ANDROID_SDK_ROOT /files/tools/android/sdk
+set -gx GOPATH /files/tools/go
 fish_add_path -gm $GOPATH/bin
 
 alias vi="nvim"
@@ -44,6 +57,9 @@ alias boldssh="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
 
 if command -q scrcpy
     alias scrcpy="scrcpy --max-size 800 --video-bit-rate 2M --keyboard=uhid"
+    # Android como desktop: display virtual 1080p, janela tiled normal (SDL_APP_ID
+    # foge da regra floating do sway para app_id="scrcpy"). `env` pula o alias acima.
+    alias scrcpy-desktop="env SDL_APP_ID=scrcpy-desktop scrcpy --new-display=1920x1080/160 --no-vd-system-decorations --video-codec=h265 --video-bit-rate=20M --max-fps=60 --keyboard=uhid --mouse=uhid --start-app=com.kiwibrowser.browser"
 end
 
 if command -q zoxide
