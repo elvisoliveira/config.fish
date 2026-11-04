@@ -15,13 +15,23 @@ if status --is-interactive
         pyenv init - fish --no-rehash | source
     end
 
-    if test -f ~/.virtualenvs/python3/bin/activate.fish
-        source ~/.virtualenvs/python3/bin/activate.fish
+    if test -f $WORKON_HOME/python3/bin/activate.fish
+        source $WORKON_HOME/python3/bin/activate.fish
     end
 
-    if test -f ~/.phpbrew/phpbrew.fish
-        source ~/.phpbrew/phpbrew.fish
+    if test -f $PHPBREW_HOME/phpbrew.fish
+        source $PHPBREW_HOME/phpbrew.fish
     end
+    # phpbrew PHPs were compiled with ~/.phpbrew as ini path + scan dir; after the
+    # move to /files/tools PHPRC/PHP_INI_SCAN_DIR must point at the relocated
+    # files. Follows `phpbrew use/switch` via PHPBREW_PHP.
+    function __phpbrew_phprc --on-variable PHPBREW_PHP
+        set -gx PHP_INI_SCAN_DIR $PHPBREW_ROOT/php/$PHPBREW_PHP/var/db
+        for f in $PHPBREW_ROOT/php/$PHPBREW_PHP/etc/cli/php.ini $PHPBREW_ROOT/php/$PHPBREW_PHP/etc/php.ini
+            test -f $f; and set -gx PHPRC $f; and return
+        end
+    end
+    set -q PHPBREW_PHP; and __phpbrew_phprc
 
     # Node LAST — after the inits above. nvm.fish auto-activates the default only
     # when nvm_current_version is unset; a shell spawned from an env that exports
@@ -33,4 +43,6 @@ if status --is-interactive
         set --erase nvm_current_version
         nvm use --silent $nvm_default_version
     end
+    # Sandboxed wrappers in ~/.local/bin (auggie, …) must shadow the same names in nvm's bin.
+    fish_add_path -gm $HOME/.local/bin
 end

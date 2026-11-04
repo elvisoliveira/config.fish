@@ -15,6 +15,12 @@ set -gx WORKON_HOME /files/tools/virtualenvs
 set -gx RBENV_ROOT /files/tools/rbenv
 set -gx SDKMAN_DIR /files/tools/sdkman
 set -gx GRADLE_USER_HOME /files/tools/gradle
+# sdkman-for-fish loads sdkman without exporting; put the candidates on PATH ourselves.
+# No pacman Java since 2026-10-28: 21 (default) for gradle/maven/maestro/android, 25 only for Ghidra.
+set -gx JAVA_HOME $SDKMAN_DIR/candidates/java/current
+for c in java gradle maven
+    test -d $SDKMAN_DIR/candidates/$c/current/bin; and fish_add_path -ga $SDKMAN_DIR/candidates/$c/current/bin
+end
 set -gx NVM_DIR /files/tools/nvm            # bash nvm; fish uses nvm.fish ($nvm_data)
 set -gx CARGO_HOME /files/tools/cargo
 set -gx RUSTUP_HOME /files/tools/rustup
@@ -26,6 +32,10 @@ set -gx CODEX_HOME /files/tools/codex
 # wezterm, browsers…; npm reads ~/.npmrc `cache=`; kubectl reads KUBECACHEDIR).
 set -gx XDG_CACHE_HOME /files/cache
 set -gx KUBECACHEDIR /files/cache/kube
+set -gx SUPABASE_HOME /files/cache/supabase     # CLI telemetry/traces (was ~/.supabase)
+set -gx NPM_CONFIG_USERCONFIG $HOME/.config/npm/npmrc   # was ~/.npmrc
+set -gx CLAUDE_CONFIG_DIR /files/tools/claude          # was ~/.claude + ~/.claude.json
+set -gx GNUPGHOME $HOME/documents/secrets/gnupg      # was ~/.gnupg (pass, gpg)
 set -gx YARN_GLOBAL_FOLDER /files/cache/yarn   # yarn berry global cache (was ~/.yarn/berry)
 
 # Dotfiles pushed out of ~ into XDG dirs (2026-10-28). git reads ~/.config/git/config natively.
@@ -34,6 +44,7 @@ set -gx W3M_DIR $HOME/.config/w3m
 set -gx RANDFILE $XDG_CACHE_HOME/openssl.rnd        # openssl 1.1 tools' ~/.rnd
 set -gx PASSWORD_STORE_DIR $HOME/.local/share/password-store
 set -gx TMUX_PLUGIN_MANAGER_PATH $HOME/.local/share/tmux/plugins   # tpack/tpm (also set in .tmux.conf)
+set -gx XAUTHORITY $XDG_RUNTIME_DIR/Xauthority      # sway's Xwayland needs no cookie; keeps ssh -X / xauth out of ~
 
 set -gx EDITOR nvim
 set -gx VIRTUAL_ENV_DISABLE_PROMPT 1
@@ -74,7 +85,7 @@ if command -q scrcpy
     # Navegador do Android como janela de desktop: display virtual só com o Brave
     # (GeckoView renderiza mal no display virtual), sem barras do Android, janela tiled normal (SDL_APP_ID
     # foge da regra floating do sway). `env` pula o alias acima.
-    alias scrcpy-desktop="env SDL_APP_ID=scrcpy-desktop scrcpy --new-display=1872x1008/160 --no-vd-system-decorations --video-codec=h265 --video-bit-rate=20M --max-fps=60 --keyboard=uhid --mouse=sdk --mouse-bind=++++ --start-app=com.brave.browser"
+    alias scrcpy-desktop="env SDL_APP_ID=scrcpy-desktop scrcpy --new-display=1872x1008/160 --no-vd-system-decorations --video-codec=h265 --video-bit-rate=20M --max-fps=60 --keyboard=uhid --mouse=sdk --mouse-bind=++++ --start-app=io.github.jqssun.helium"
 end
 
 if command -q zoxide
