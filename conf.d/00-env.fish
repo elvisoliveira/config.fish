@@ -80,7 +80,6 @@ alias vi="nvim"
 if command -q eza
     alias ls="eza --icons"
 end
-# alias grep="rg -n --glob '!{.git,node_modules,vendor,dll,build,coverage}'"
 alias boldssh="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
 
 if command -q scrcpy
