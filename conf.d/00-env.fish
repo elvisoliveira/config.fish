@@ -31,6 +31,7 @@ set -gx CODEX_HOME /files/tools/codex
 # Caches live on /files too (XDG_CACHE_HOME covers pip, composer, huggingface, fish,
 # wezterm, browsers…; npm reads ~/.npmrc `cache=`; kubectl reads KUBECACHEDIR).
 set -gx XDG_CACHE_HOME /files/cache
+set -gx HF_HOME /files/cache/huggingface      # hf-hub (Rust, Handy ≥0.10) ignores XDG and only reads HF_HOME; python huggingface_hub lands here via XDG anyway
 set -gx KUBECACHEDIR /files/cache/kube
 set -gx SUPABASE_HOME /files/cache/supabase     # CLI telemetry/traces (was ~/.supabase)
 set -gx NPM_CONFIG_USERCONFIG $HOME/.config/npm/npmrc   # was ~/.npmrc
@@ -48,7 +49,6 @@ set -gx XAUTHORITY $XDG_RUNTIME_DIR/Xauthority      # sway's Xwayland needs no c
 
 set -gx EDITOR nvim
 set -gx VIRTUAL_ENV_DISABLE_PROMPT 1
-set -gx BUN_INSTALL /files/tools/bun
 
 # gcloud needs python; pin it to the pyenv-managed interpreter only when that
 # specific install is present, otherwise leave gcloud to use its bundled one.
@@ -58,7 +58,6 @@ end
 
 fish_add_path -gm $RBENV_ROOT/bin
 fish_add_path -gm $RBENV_ROOT/shims
-fish_add_path -gm $BUN_INSTALL/bin
 fish_add_path -gm $CARGO_HOME/bin
 fish_add_path -ga /files/tools/maestro/bin
 # Node (nvm.fish) is activated at the END of 50-interactive.fish, on purpose:
@@ -72,6 +71,10 @@ set -gx ANDROID_HOME /files/tools/android/sdk
 set -gx ANDROID_SDK_ROOT /files/tools/android/sdk
 set -gx GOPATH /files/tools/go
 fish_add_path -gm $GOPATH/bin
+# arduino-cli: DATA also relocates inventory.yaml (otherwise ~/.arduino15)
+set -gx ARDUINO_DIRECTORIES_DATA /files/tools/arduino/data
+set -gx ARDUINO_DIRECTORIES_USER /files/tools/arduino/user
+set -gx ARDUINO_DIRECTORIES_DOWNLOADS /files/tools/arduino/dl
 
 alias vi="nvim"
 if command -q eza
