@@ -15,11 +15,11 @@ if status --is-interactive
         pyenv init - fish --no-rehash | source
     end
 
-    if test -f $WORKON_HOME/python3/bin/activate.fish
+    if test -f "$WORKON_HOME/python3/bin/activate.fish"
         source $WORKON_HOME/python3/bin/activate.fish
     end
 
-    if test -f $PHPBREW_HOME/phpbrew.fish
+    if test -f "$PHPBREW_HOME/phpbrew.fish"
         source $PHPBREW_HOME/phpbrew.fish
     end
     # phpbrew PHPs were compiled with ~/.phpbrew as ini path + scan dir; after the
