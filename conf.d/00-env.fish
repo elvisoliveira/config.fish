@@ -65,7 +65,9 @@ end
 alias boldssh="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
 
 if command -q scrcpy
-    alias scrcpy="scrcpy --max-size 800 --video-bit-rate 2M --keyboard=uhid"
+    # sdk keyboard + --prefer-text: uhid drops the ABNT2 /? key (HID 0x87, scrcpy#6235) and
+    # SDL text input swallows dead keys, so send composed text instead of physical keys.
+    alias scrcpy="scrcpy --max-size 800 --video-bit-rate 2M --keyboard=sdk --prefer-text"
     # Android browser as a desktop window: a virtual display with the browser only
     # (GeckoView renders badly on the virtual display), no Android bars, a normal tiled window (SDL_APP_ID
     # escapes the sway floating rule). `env` bypasses the alias above.
